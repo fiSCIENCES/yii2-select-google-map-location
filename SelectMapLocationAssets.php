@@ -1,6 +1,6 @@
 <?php
 
-namespace kalyabin\maplocation;
+namespace andrapratama\maplocation;
 
 use yii\web\AssetBundle;
 
