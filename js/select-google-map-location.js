@@ -15,12 +15,12 @@
  * @param {Function|undefined} options.onLoadMap Callback function to render map
  * @param {String|undefined} options.addressNotFound Description for not found address error
  */
-(function($) {
-    $.fn.selectLocation = function(options) {
+(function ($) {
+    $.fn.selectLocation = function (options) {
         var self = this;
         var map;
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             var mapOptions = {
                 center: new google.maps.LatLng(options.defaultLatitude || 55.997778, options.defaultLongitude || 37.190278),
                 zoom: options.defaultZoom || 12,
@@ -38,7 +38,7 @@
 
             // create marker when map clicked
             if (options.draggable) {
-                google.maps.event.addListener(map, 'click', function(e) {
+                google.maps.event.addListener(map, 'click', function (e) {
                     geocodePosition(e.latLng);
                     createMarker(e.latLng);
                 });
@@ -49,13 +49,13 @@
              *
              * @param {Object} latLng google.maps.LatLng
              */
-            var geocodePosition = function(latLng) {
+            var geocodePosition = function (latLng) {
                 var geocoder = new google.maps.Geocoder();
                 geocoder.geocode(
                     {
                         latLng: latLng
                     },
-                    function(results, status) {
+                    function (results, status) {
                         if (status === google.maps.GeocoderStatus.OK) {
                             if (results[0].formatted_address) {
                                 // revert geocode
@@ -77,7 +77,7 @@
              *
              * @param {Object} latLng
              */
-            var createMarker = function(latLng) {
+            var createMarker = function (latLng) {
                 // remove older marker
                 if (marker) {
                     marker.remove();
@@ -86,19 +86,19 @@
                     // do not use marker
                     return;
                 }
-                marker = new google.maps.marker.AdvancedMarkerElement({
-                    'position'          : latLng,
-                    'map'               : map,
-                    'draggable'         : options.draggable
+                marker = new google.maps.AdvancedMarkerElement({
+                    'position': latLng,
+                    'map': map,
+                    'draggable': options.draggable
                 });
 
                 if (options.draggable) {
-                    google.maps.event.addListener(marker, 'dragend', function() {
+                    google.maps.event.addListener(marker, 'dragend', function () {
                         marker.changePosition(marker.getPosition());
                     });
                 }
 
-                marker.remove = function() {
+                marker.remove = function () {
                     google.maps.event.clearInstanceListeners(this);
                     this.setMap(null);
                 };
@@ -111,7 +111,7 @@
              *
              * @param {Object} point google.maps.LatLng
              */
-            var setLatLngAttributes = function(point) {
+            var setLatLngAttributes = function (point) {
                 $(options.latitude).val(point.lat());
                 $(options.longitude).val(point.lng());
             };
@@ -121,7 +121,7 @@
              *
              * @param {Object} item
              */
-            var selectLocation = function(item) {
+            var selectLocation = function (item) {
                 if (!item.geometry) {
                     return;
                 }
@@ -148,7 +148,7 @@
             // address validation using yii.activeForm.js
             if ($(options.address).parents('form').length) {
                 var $form = $(options.address).parents('form');
-                $form.on('afterValidateAttribute', function(e, attribute, messages) {
+                $form.on('afterValidateAttribute', function (e, attribute, messages) {
                     if (attribute.input === options.address && !$(options.latitude).val() && !$(options.longitude).val() && !messages.length) {
                         // address not found
                         messages.push(options.addressNotFound);
@@ -160,7 +160,7 @@
             // address autocomplete using google autocomplete
             var autocomplete = new google.maps.places.Autocomplete($(options.address).get(0));
 
-            google.maps.event.addListener(autocomplete, 'place_changed', function() {
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
                 var place = autocomplete.getPlace();
                 if (!place) {
                     return;
@@ -169,8 +169,8 @@
             });
 
             var defaults = {
-                'lat'       : $(options.latitude).val(),
-                'lng'       : $(options.longitude).val()
+                'lat': $(options.latitude).val(),
+                'lng': $(options.longitude).val()
             };
             if (defaults.lat && defaults.lng) {
                 var center = new google.maps.LatLng(defaults.lat, defaults.lng);
