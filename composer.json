@@ -27,7 +27,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "kalyabin\\maplocation\\": ""
+            "andrapratama\\maplocation\\": ""
         }
     },
     "minimum-stability": "stable",
