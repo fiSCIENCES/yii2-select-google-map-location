@@ -18,7 +18,7 @@
 (function ($) {
     $.fn.selectLocation = function (options) {
         var self = this;
-        var map;
+        let map;
 
         $(document).ready(function () {
             initialization();
@@ -26,7 +26,7 @@
 
         function initialization() {
             async function initMap() {
-                // const { Map } = await google.maps.importLibrary("maps");
+                const { Map } = await google.maps.importLibrary("maps");
                 const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
                 var mapOptions = {
