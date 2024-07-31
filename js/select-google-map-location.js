@@ -86,7 +86,7 @@
                     // do not use marker
                     return;
                 }
-                marker = new google.maps.Marker({
+                marker = new google.maps.marker.AdvancedMarkerElement({
                     'position'          : latLng,
                     'map'               : map,
                     'draggable'         : options.draggable
