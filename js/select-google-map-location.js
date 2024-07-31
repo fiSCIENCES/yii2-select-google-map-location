@@ -28,14 +28,17 @@
             async function initMap() {
                 const { Map } = await google.maps.importLibrary("maps");
                 const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-                map = new Map($(self).get(0), mapOptions);
 
                 var mapOptions = {
                     center: new google.maps.LatLng(options.defaultLatitude || 55.997778, options.defaultLongitude || 37.190278),
                     zoom: options.defaultZoom || 12,
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
-                    panControl: true
+                    panControl: true,
+                    mapId: "mapId",
                 };
+                map = new Map($(self).get(0), mapOptions);
+
+
                 // map = new google.maps.Map($(self).get(0), mapOptions);
 
                 if (options.onLoadMap) {
