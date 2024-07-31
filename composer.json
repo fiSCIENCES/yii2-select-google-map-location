@@ -1,9 +1,14 @@
 {
-    "name": "kalyabin/yii2-select-google-map-location",
+    "name": "andrapratama/yii2-select-google-map-location",
     "description": "Yii2 widget to select location at map and choose map coordinates",
     "type": "package",
     "keywords": [
-        "yii2", "framework", "widgets", "location", "map", "input widget"
+        "yii2",
+        "framework",
+        "widgets",
+        "location",
+        "map",
+        "input widget"
     ],
     "require": {
         "php": ">=5.4.0",
