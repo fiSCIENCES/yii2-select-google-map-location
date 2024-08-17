@@ -35,12 +35,60 @@ use yii\widgets\InputWidget;
  *
  * @property Model $model base yii2 model or ActiveRecord object
  * @property string $attribute attribute to write map location
+ * @property string $attributeName attribute to write location name
+ * @property string $attributeAddressStreetNumber attribute to write location street number
+ * @property string $attributeAddressRoute attribute to write location street number
+ * @property string $attributeAddressLocality attribute to write location city
+ * @property string $attributeAddressAdmAreaLevel2 attribute to write location region
+ * @property string $attributeAddressAdmAreaLevel1 attribute to write location province/state
+ * @property string $attributeAddressCountry attribute to write location country
+ * @property string $attributeAddressPostalCode attribute to write location postal code
  * @property string $attributeLatitude attribute to write location latitude
  * @property string $attributeLongitude attribute to write location longitude
  * @property callable|null $renderWidgetMap custom function to render map
  */
 class SelectMapLocationWidget extends InputWidget
 {
+    /**
+     * @var string name attribute name
+     */
+    public $attributeName;
+
+    /**
+     * @var string addressStreetNumber attribute name
+     */
+    public $attributeAddressStreetNumber;
+
+    /**
+     * @var string addressRoute attribute name
+     */
+    public $attributeAddressRoute;
+
+    /**
+     * @var string addressLocality attribute name
+     */
+    public $attributeAddressLocality;
+
+    /**
+     * @var string addressAdmAreaLevel2 attribute name
+     */
+    public $attributeAddressAdmAreaLevel2;
+
+    /**
+     * @var string addressAdmAreaLevel1 attribute name
+     */
+    public $attributeAddressAdmAreaLevel1;
+
+    /**
+     * @var string addressCountry attribute name
+     */
+    public $attributeAddressCountry;
+
+    /**
+     * @var string addressPostalCode attribute name
+     */
+    public $attributeAddressPostalCode;
+
     /**
      * @var string latitude attribute name
      */
@@ -102,26 +150,61 @@ class SelectMapLocationWidget extends InputWidget
 
         // getting inputs ids
         $address = Html::getInputId($this->model, $this->attribute);
+        $name = Html::getInputId($this->model, $this->attributeName);
+        $addressStreetNumber = Html::getInputId($this->model, $this->attributeAddressStreetNumber);
+        $addressRoute = Html::getInputId($this->model, $this->attributeAddressRoute);
+        $addressLocality = Html::getInputId($this->model, $this->attributeAddressLocality);
+        $addressAdmAreaLevel2 = Html::getInputId($this->model, $this->attributeAddressAdmAreaLevel2);
+        $addressAdmAreaLevel1 = Html::getInputId($this->model, $this->attributeAddressAdmAreaLevel1);
+        $addressCountry = Html::getInputId($this->model, $this->attributeAddressCountry);
+        $addressPostalCode = Html::getInputId($this->model, $this->attributeAddressPostalCode);
         $latitude = Html::getInputId($this->model, $this->attributeLatitude);
         $longitude = Html::getInputId($this->model, $this->attributeLongitude);
 
         $jsOptions = ArrayHelper::merge($this->jsOptions, [
-            'address'           => '#' . $address,
-            'latitude'          => '#' . $latitude,
-            'longitude'         => '#' . $longitude,
-            'draggable'         => $this->draggable,
+            'address'               => '#' . $address,
+            'name'                  => '#' . $name,
+            'addressStreetNumber'   => '#' . $addressStreetNumber,
+            'addressRoute'          => '#' . $addressRoute,
+            'addressLocality'       => '#' . $addressLocality,
+            'addressAdmAreaLevel2'  => '#' . $addressAdmAreaLevel2,
+            'addressAdmAreaLevel1'  => '#' . $addressAdmAreaLevel1,
+            'addressCountry'        => '#' . $addressCountry,
+            'addressPostalCode'     => '#' . $addressPostalCode,
+            'latitude'              => '#' . $latitude,
+            'longitude'             => '#' . $longitude,
+            'draggable'             => $this->draggable,
         ]);
         // message about not founded addess
         if (!isset($jsOptions['addressNotFound'])) {
-            $hasMainCategory = isset(Yii::$app->i18n->translations['*']) || isset(Yii::$app->i18n->translations['main']);
-            $jsOptions['addressNotFound'] = $hasMainCategory ? Yii::t('main', 'Address not found') : 'Address not found';
+//            $hasMainCategory = isset(Yii::$app->i18n->translations['*']) || isset(Yii::$app->i18n->translations['main']);
+//            $jsOptions['addressNotFound'] = $hasMainCategory ? Yii::t('main', 'Address not found') : 'Address not found';
+            $jsOptions['addressNotFound'] = Yii::t('kalyabin.maplocation', 'Address not found'); //  If not found, return the message anyway! MPLT
         }
         $this->view->registerJs(new JsExpression('
             $(document).ready(function() {
                 $(\'#' . $this->wrapperOptions['id'] . '\').selectLocation(' . Json::encode($jsOptions) . ');
             });
         '));
+        $this->view->registerJs(new JsExpression('
+            function getAddress() {
+                let list = $(this).val().split(",");
+                document.getElementById("sladdress-address1").innerHTML = list[0];
+                document.getElementById("sladdress-city").innerHTML = list[1];
+                document.getElementById("sladdress-state").innerHTML = list[2];
+                document.getElementById("sladdress-country").innerHTML = list[3];
+            }
+        '));
+
         $mapHtml = Html::tag('div', '', $this->wrapperOptions);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeName);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressStreetNumber);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressRoute);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressLocality);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressAdmAreaLevel2);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressAdmAreaLevel1);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressCountry);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressPostalCode);
         $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeLatitude);
         $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeLongitude);
 
@@ -135,7 +218,7 @@ class SelectMapLocationWidget extends InputWidget
         }
 
         $this->field->parts['{map}'] = $mapHtml;
-
+        $this->textOptions['onchange'] = "getAddress()";    // $(this).val()
         return Html::activeInput('text', $this->model, $this->attribute, $this->textOptions);
     }
 }
