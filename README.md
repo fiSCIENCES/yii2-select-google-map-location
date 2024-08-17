@@ -15,7 +15,7 @@ When choosing a location map of switches and sets the marker to the selected loc
 
 Run at your console:
 ```bash
-php composer.phar require "kalyabin/yii2-select-google-map-location" "*"
+php composer.phar require "fisciences/yii2-select-google-map-location" "*"
 ```
 
 ## Register Google API
@@ -38,6 +38,14 @@ class SearchLocation extends \yii\base\Model
     public $address;
     public $longitude;
     public $latitude;
+    public $component_name;
+    public $component_street_number;
+    public $component_route;
+    public $component_locality;
+    public $component_adm_area_level_2;
+    public $component_adm_area_level_1;
+    public $component_country;
+    public $component_postal_code;
     ...
 }
 ```
@@ -86,3 +94,6 @@ $form->field($model, 'address', [
 ...
 \yii\widgets\ActiveForm::end();
 ```
+
+After you search for a location and the Submit is done, your $address and $component_* fields will have all the details.
+Enjoy!
