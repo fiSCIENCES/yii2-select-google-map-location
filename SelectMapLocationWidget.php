@@ -1,5 +1,5 @@
 <?php
-namespace fisciences\maplocation;
+namespace kalyabin\maplocation;
 
 use Yii;
 use yii\base\Model;
