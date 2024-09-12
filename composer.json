@@ -1,5 +1,5 @@
 {
-    "name": "kalyabin/yii2-select-google-map-location",
+    "name": "fisciences/yii2-select-google-map-location",
     "description": "Yii2 widget to select location at map and choose map coordinates",
     "type": "package",
     "keywords": [
@@ -12,6 +12,10 @@
     "license": "BSD-3-Clause",
     "authors": [
         {
+            "name": "Martin Pineault",
+            "email": "martin.pineault@fisciences.com"
+        },
+        {
             "name": "Max Kalyabin",
             "email": "maksim@kalyabin.ru"
         },
@@ -22,13 +26,13 @@
     ],
     "autoload": {
         "psr-4": {
-            "kalyabin\\maplocation\\": ""
+            "fisciences\\maplocation\\": ""
         }
     },
     "minimum-stability": "stable",
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "1.1.x-dev"
         }
     }
 }
