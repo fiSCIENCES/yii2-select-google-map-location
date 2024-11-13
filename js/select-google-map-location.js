@@ -10,6 +10,7 @@
  * @param {Number} options.defaultLongitude Default longitude
  * @param {String|jQuery|HTMLInputElement} options.address Address input selector
  * @param {String|jQuery|HTMLInputElement} options.name Name result from location
+ * @param {String|jQuery|HTMLInputElement} options.plusCode To be use when address Street & Route not available!
  * @param {String|jQuery|HTMLInputElement} options.addressStreetNumber Street number result from location
  * @param {String|jQuery|HTMLInputElement} options.addressRoute Route result from location
  * @param {String|jQuery|HTMLInputElement} options.addressLocality City result from location
@@ -89,51 +90,98 @@
                 );
             };
 
-                /**
-                 * Create marker into map
-                 *
-                 * Input object type - google.maps.LatLng
-                 *
-                 * @param {Object} latLng
-                 */
-                var createMarker = function (latLng) {
-                    // remove older marker
-                    if (marker) {
-                        marker.remove();
+            /**
+             * Get Address components from Google Map to return
+             *
+             * @param {Object} results JSON
+             */
+            var getComponents = function(results) {
+                $(options.name).val(results.name);
+                $(options.name).trigger('change');
+                for (let i = 0; i < results.address_components.length; i++) {
+                    for (let j = 0; j < results.address_components[i].types.length; j++) {
+                        if (results.address_components[i].types[j] === "plus_code") {    // Used if no address!
+                            $(options.plusCode).val(results.address_components[i].long_name);
+                            $(options.plusCode).trigger('change');
+                        }
+                        if (results.address_components[i].types[j] === "street_number") {
+                            $(options.addressStreetNumber).val(results.address_components[i].long_name);
+                            $(options.addressStreetNumber).trigger('change');
+                        }
+                        if (results.address_components[i].types[j] === "route") {
+                            $(options.addressRoute).val(results.address_components[i].long_name);
+                            $(options.addressRoute).trigger('change');
+                        }
+                        // sublocality_level_1 (i.e.: Desjardins)
+                        if (results.address_components[i].types[j] === "locality") {
+                            $(options.addressLocality).val(results.address_components[i].long_name);
+                            $(options.addressLocality).trigger('change');
+                        }
+                        if (results.address_components[i].types[j] === "administrative_area_level_2") {
+                            $(options.addressAdmAreaLevel2).val(results.address_components[i].long_name);
+                            $(options.addressAdmAreaLevel2).trigger('change');
+                        }
+                        if (results.address_components[i].types[j] === "administrative_area_level_1") {
+                            $(options.addressAdmAreaLevel1).val(results.address_components[i].long_name);
+                            $(options.addressAdmAreaLevel1).trigger('change');
+                        }
+                        if (results.address_components[i].types[j] === "country") {
+                            $(options.addressCountry).val(results.address_components[i].long_name);
+                            $(options.addressCountry).trigger('change');
+                        }
+                        if (results.address_components[i].types[j] === "postal_code") {
+                            $(options.addressPostalCode).val(results.address_components[i].long_name);
+                            $(options.addressPostalCode).trigger('change');
+                        }
                     }
-                    if (options.hideMarker) {
-                        // do not use marker
-                        return;
-                    }
-                    marker = new google.maps.marker.AdvancedMarkerElement({
-                        'position': latLng,
-                        'map': map,
-                        'draggable': options.draggable
+                }
+            }
+
+            /**
+             * Create marker into map
+             *
+             * Input object type - google.maps.LatLng
+             *
+             * @param {Object} latLng
+             */
+            var createMarker = function (latLng) {
+                // remove older marker
+                if (marker) {
+                    marker.remove();
+                }
+                if (options.hideMarker) {
+                    // do not use marker
+                    return;
+                }
+                marker = new google.maps.marker.AdvancedMarkerElement({
+                    'position': latLng,
+                    'map': map,
+                    'draggable': options.draggable
+                });
+
+                if (options.draggable) {
+                    google.maps.event.addListener(marker, 'dragend', function () {
+                        marker.changePosition(marker.getPosition());
                     });
+                }
 
-                    if (options.draggable) {
-                        google.maps.event.addListener(marker, 'dragend', function () {
-                            marker.changePosition(marker.getPosition());
-                        });
-                    }
-
-                    marker.remove = function () {
-                        google.maps.event.clearInstanceListeners(this);
-                        this.setMap(null);
-                    };
-
-                    marker.changePosition = geocodePosition;
+                marker.remove = function () {
+                    google.maps.event.clearInstanceListeners(this);
+                    this.setMap(null);
                 };
 
-                /**
-                 * Touch point coordinates
-                 *
-                 * @param {Object} point google.maps.LatLng
-                 */
-                var setLatLngAttributes = function (point) {
-                    $(options.latitude).val(point.lat());
-                    $(options.longitude).val(point.lng());
-                };
+                marker.changePosition = geocodePosition;
+            };
+
+            /**
+             * Touch point coordinates
+             *
+             * @param {Object} point google.maps.LatLng
+             */
+            var setLatLngAttributes = function (point) {
+                $(options.latitude).val(point.lat());
+                $(options.longitude).val(point.lng());
+            };
 
             /**
              * Select location with geometry

@@ -37,6 +37,7 @@ use yii\widgets\InputWidget;
  * @property Model $model base yii2 model or ActiveRecord object
  * @property string $attribute attribute to write map location
  * @property string $attributeName attribute to write location name
+ * @property string $attributePlusCode attribute to write location plus code
  * @property string $attributeAddressStreetNumber attribute to write location street number
  * @property string $attributeAddressRoute attribute to write location street number
  * @property string $attributeAddressLocality attribute to write location city
@@ -59,6 +60,11 @@ class SelectMapLocationWidget extends InputWidget
      * @var string addressStreetNumber attribute name
      */
     public $attributeAddressStreetNumber;
+
+    /**
+     * @var string plusCode attribute name
+     */
+    public $attributePlusCode;
 
     /**
      * @var string addressRoute attribute name
@@ -152,6 +158,7 @@ class SelectMapLocationWidget extends InputWidget
         // getting inputs ids
         $address = Html::getInputId($this->model, $this->attribute);
         $name = Html::getInputId($this->model, $this->attributeName);
+        $plusCode = Html::getInputId($this->model, $this->attributePlusCode);
         $addressStreetNumber = Html::getInputId($this->model, $this->attributeAddressStreetNumber);
         $addressRoute = Html::getInputId($this->model, $this->attributeAddressRoute);
         $addressLocality = Html::getInputId($this->model, $this->attributeAddressLocality);
@@ -165,6 +172,7 @@ class SelectMapLocationWidget extends InputWidget
         $jsOptions = ArrayHelper::merge($this->jsOptions, [
             'address'               => '#' . $address,
             'name'                  => '#' . $name,
+            'plusCode'              => '#' . $plusCode,
             'addressStreetNumber'   => '#' . $addressStreetNumber,
             'addressRoute'          => '#' . $addressRoute,
             'addressLocality'       => '#' . $addressLocality,
@@ -199,6 +207,7 @@ class SelectMapLocationWidget extends InputWidget
 
         $mapHtml = Html::tag('div', '', $this->wrapperOptions);
         $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeName);
+        $mapHtml .= Html::activeHiddenInput($this->model, $this->attributePlusCode);
         $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressStreetNumber);
         $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressRoute);
         $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeAddressLocality);
