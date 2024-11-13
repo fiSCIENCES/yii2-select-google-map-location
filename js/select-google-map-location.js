@@ -23,34 +23,46 @@
  * @param {Function|undefined} options.onLoadMap Callback function to render map
  * @param {String|undefined} options.addressNotFound Description for not found address error
  */
-(function($) {
-    $.fn.selectLocation = function(options) {
+(function ($) {
+    $.fn.selectLocation = function (options) {
         var self = this;
-        var map;
+        let map;
 
-        $(document).ready(function() {
-            var mapOptions = {
-                center: new google.maps.LatLng(options.defaultLatitude || 46.829853, options.defaultLongitude || -71.254028),
-                zoom: 12,
-                mapTypeId: google.maps.MapTypeId.ROADMAP,
-                panControl: true
-            };
-            map = new google.maps.Map($(self).get(0), mapOptions);
+        $(document).ready(function () {
+            initialization();
+        });
 
-            if (options.onLoadMap) {
-                options.onLoadMap(map);
-            }
+        function initialization() {
+            async function initMap() {
+                const { Map } = await window.google.maps.importLibrary("maps");
+                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-            // marker for founded point
-            var marker = null;
+                var mapOptions = {
+                    center: new google.maps.LatLng(options.defaultLatitude || 55.997778, options.defaultLongitude || 37.190278),
+                    zoom: options.defaultZoom || 18,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    panControl: true,
+                    mapId: "mapId",
+                };
+                map = new Map($(self).get(0), mapOptions);
 
-            // create marker when map clicked
-            if (options.draggable) {
-                google.maps.event.addListener(map, 'click', function(e) {
-                    geocodePosition(e.latLng);
-                    createMarker(e.latLng);
-                });
-            }
+
+                // map = new google.maps.Map($(self).get(0), mapOptions);
+
+                if (options.onLoadMap) {
+                    options.onLoadMap(map);
+                }
+
+                // marker for founded point
+                var marker = null;
+
+                // create marker when map clicked
+                if (options.draggable) {
+                    google.maps.event.addListener(map, 'click', function (e) {
+                        geocodePosition(e.latLng);
+                        createMarker(e.latLng);
+                    });
+                }
 
             /**
              * Geocode position by selected latitude and longitude
@@ -77,94 +89,51 @@
                 );
             };
 
-            /**
-             * Get Address components from Google Map to return
-             *
-             * @param {Object} results JSON
-             */
-            var getComponents = function(results) {
-                $(options.name).val(results.name);
-                $(options.name).trigger('change');
-                for (let i = 0; i < results.address_components.length; i++) {
-                    for (let j = 0; j < results.address_components[i].types.length; j++) {
-                        if (results.address_components[i].types[j] == "street_number") {
-                            $(options.addressStreetNumber).val(results.address_components[i].long_name);
-                            $(options.addressStreetNumber).trigger('change');
-                        }
-                        if (results.address_components[i].types[j] === "route") {
-                            $(options.addressRoute).val(results.address_components[i].long_name);
-                            $(options.addressRoute).trigger('change');
-                        }
-                        // sublocality_level_1 (i.e.: Desjardins)
-                        if (results.address_components[i].types[j] === "locality") {
-                            $(options.addressLocality).val(results.address_components[i].long_name);
-                            $(options.addressLocality).trigger('change');
-                        }
-                        if (results.address_components[i].types[j] === "administrative_area_level_2") {
-                            $(options.addressAdmAreaLevel2).val(results.address_components[i].long_name);
-                            $(options.addressAdmAreaLevel2).trigger('change');
-                        }
-                        if (results.address_components[i].types[j] === "administrative_area_level_1") {
-                            $(options.addressAdmAreaLevel1).val(results.address_components[i].long_name);
-                            $(options.addressAdmAreaLevel1).trigger('change');
-                        }
-                        if (results.address_components[i].types[j] === "country") {
-                            $(options.addressCountry).val(results.address_components[i].long_name);
-                            $(options.addressCountry).trigger('change');
-                        }
-                        if (results.address_components[i].types[j] === "postal_code") {
-                            $(options.addressPostalCode).val(results.address_components[i].long_name);
-                            $(options.addressPostalCode).trigger('change');
-                        }
+                /**
+                 * Create marker into map
+                 *
+                 * Input object type - google.maps.LatLng
+                 *
+                 * @param {Object} latLng
+                 */
+                var createMarker = function (latLng) {
+                    // remove older marker
+                    if (marker) {
+                        marker.remove();
                     }
-                }
-            }
-
-            /**
-             * Create marker into map
-             *
-             * Input object type - google.maps.LatLng
-             *
-             * @param {Object} latLng
-             */
-            var createMarker = function(latLng) {
-                // remove older marker
-                if (marker) {
-                    marker.remove();
-                }
-                if (options.hideMarker) {
-                    // do not use marker
-                    return;
-                }
-                marker = new google.maps.Marker({
-                    'position'          : latLng,
-                    'map'               : map,
-                    'draggable'         : options.draggable
-                });
-
-                if (options.draggable) {
-                    google.maps.event.addListener(marker, 'dragend', function() {
-                        marker.changePosition(marker.getPosition());
+                    if (options.hideMarker) {
+                        // do not use marker
+                        return;
+                    }
+                    marker = new google.maps.marker.AdvancedMarkerElement({
+                        'position': latLng,
+                        'map': map,
+                        'draggable': options.draggable
                     });
-                }
 
-                marker.remove = function() {
-                    google.maps.event.clearInstanceListeners(this);
-                    this.setMap(null);
+                    if (options.draggable) {
+                        google.maps.event.addListener(marker, 'dragend', function () {
+                            marker.changePosition(marker.getPosition());
+                        });
+                    }
+
+                    marker.remove = function () {
+                        google.maps.event.clearInstanceListeners(this);
+                        this.setMap(null);
+                    };
+
+                    marker.changePosition = geocodePosition;
                 };
 
-                marker.changePosition = geocodePosition;
-            };
-
-            /**
-             * Touch point coordinates
-             *
-             * @param {Object} point google.maps.LatLng
-             */
-            var setLatLngAttributes = function(point) {
-                $(options.latitude).val(point.lat());
-                $(options.longitude).val(point.lng());
-            };
+                /**
+                 * Touch point coordinates
+                 *
+                 * @param {Object} point google.maps.LatLng
+                 */
+                var setLatLngAttributes = function (point) {
+                    $(options.latitude).val(point.lat());
+                    $(options.longitude).val(point.lng());
+                };
 
             /**
              * Select location with geometry
@@ -196,39 +165,42 @@
                 }
             };
 
-            // address validation using yii.activeForm.js
-            if ($(options.address).parents('form').length) {
-                var $form = $(options.address).parents('form');
-                $form.on('afterValidateAttribute', function(e, attribute, messages) {
-                    if (attribute.input === options.address && !$(options.latitude).val() && !$(options.longitude).val() && !messages.length) {
-                        // address not found
-                        messages.push(options.addressNotFound);
-                        e.preventDefault();
-                    }
-                });
-            }
-
-            // address autocomplete using google autocomplete
-            var autocomplete = new google.maps.places.Autocomplete($(options.address).get(0));
-
-            google.maps.event.addListener(autocomplete, 'place_changed', function() {
-                var place = autocomplete.getPlace();
-                if (!place) {
-                    return;
+                // address validation using yii.activeForm.js
+                if ($(options.address).parents('form').length) {
+                    var $form = $(options.address).parents('form');
+                    $form.on('afterValidateAttribute', function (e, attribute, messages) {
+                        if (attribute.input === options.address && !$(options.latitude).val() && !$(options.longitude).val() && !messages.length) {
+                            // address not found
+                            messages.push(options.addressNotFound);
+                            e.preventDefault();
+                        }
+                    });
                 }
-                selectLocation(place);
-            });
 
-            var defaults = {
-                'lat'       : $(options.latitude).val(),
-                'lng'       : $(options.longitude).val()
-            };
-            if (defaults.lat && defaults.lng) {
-                var center = new google.maps.LatLng(defaults.lat, defaults.lng);
-                map.setCenter(center);
-                createMarker(center);
-                setLatLngAttributes(center);
+                // address autocomplete using google autocomplete
+                var autocomplete = new google.maps.places.Autocomplete($(options.address).get(0));
+
+                google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                    var place = autocomplete.getPlace();
+                    if (!place) {
+                        return;
+                    }
+                    selectLocation(place);
+                });
+
+                var defaults = {
+                    'lat': $(options.latitude).val(),
+                    'lng': $(options.longitude).val()
+                };
+                if (defaults.lat && defaults.lng) {
+                    var center = new google.maps.LatLng(defaults.lat, defaults.lng);
+                    map.setCenter(center);
+                    createMarker(center);
+                    setLatLngAttributes(center);
+                }
             }
-        });
+
+            initMap();
+        }
     };
 })(jQuery);

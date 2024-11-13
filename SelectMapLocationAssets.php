@@ -1,5 +1,6 @@
 <?php
-namespace kalyabin\maplocation;
+
+namespace andrapratama\maplocation;
 
 use yii\web\AssetBundle;
 
@@ -12,7 +13,7 @@ use yii\web\AssetBundle;
  */
 class SelectMapLocationAssets extends AssetBundle
 {
-    public $sourcePath = '@vendor/kalyabin/yii2-select-google-map-location/js';
+    public $sourcePath = '@vendor/andrapratama/yii2-select-google-map-location/js';
     public $css = [];
     public $js = [
         'select-google-map-location.js',
@@ -34,7 +35,7 @@ class SelectMapLocationAssets extends AssetBundle
     public static function register($view)
     {
         /* @var $view \yii\web\View */
-        $view->registerJsFile('https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=' . self::$googleMapApiKey);
+        $view->registerJsFile('https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&loading=async&key=' . self::$googleMapApiKey);
         return parent::register($view);
     }
 }
