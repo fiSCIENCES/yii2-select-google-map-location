@@ -1,6 +1,6 @@
 <?php
 
-namespace andrapratama\maplocation;
+namespace kalyabin\maplocation;
 
 use Yii;
 use yii\base\Model;
