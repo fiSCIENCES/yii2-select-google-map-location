@@ -26,44 +26,39 @@
  */
 (function ($) {
     $.fn.selectLocation = function (options) {
-        var self = this;
+        let self = this;
         let map;
 
-        $(document).ready(function () {
-            initialization();
-        });
+        // Définir initMap dans le contexte global
+        window.initMap = async function () {
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-        function initialization() {
-            async function initMap() {
-                const { Map } = await window.google.maps.importLibrary("maps");
-                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            var mapOptions = {
+                center: new google.maps.LatLng(options.defaultLatitude || 46.829853, options.defaultLongitude || -71.254028),
+                zoom: options.defaultZoom || 12,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                panControl: true,
+                mapId: "mapId",
+            };
+            map = new Map($(self).get(0), mapOptions);
 
-                var mapOptions = {
-                    center: new google.maps.LatLng(options.defaultLatitude || 55.997778, options.defaultLongitude || 37.190278),
-                    zoom: options.defaultZoom || 18,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP,
-                    panControl: true,
-                    mapId: "mapId",
-                };
-                map = new Map($(self).get(0), mapOptions);
+            // map = new google.maps.Map($(self).get(0), mapOptions);
 
+            if (options.onLoadMap) {
+                options.onLoadMap(map);
+            }
 
-                // map = new google.maps.Map($(self).get(0), mapOptions);
+            // marker for founded point
+            var marker = null;
 
-                if (options.onLoadMap) {
-                    options.onLoadMap(map);
-                }
-
-                // marker for founded point
-                var marker = null;
-
-                // create marker when map clicked
-                if (options.draggable) {
-                    google.maps.event.addListener(map, 'click', function (e) {
-                        geocodePosition(e.latLng);
-                        createMarker(e.latLng);
-                    });
-                }
+            // create marker when map clicked
+            if (options.draggable) {
+                google.maps.event.addListener(map, 'click', function (e) {
+                    geocodePosition(e.latLng);
+                    createMarker(e.latLng);
+                });
+            }
 
             /**
              * Geocode position by selected latitude and longitude
@@ -213,42 +208,46 @@
                 }
             };
 
-                // address validation using yii.activeForm.js
-                if ($(options.address).parents('form').length) {
-                    var $form = $(options.address).parents('form');
-                    $form.on('afterValidateAttribute', function (e, attribute, messages) {
-                        if (attribute.input === options.address && !$(options.latitude).val() && !$(options.longitude).val() && !messages.length) {
-                            // address not found
-                            messages.push(options.addressNotFound);
-                            e.preventDefault();
-                        }
-                    });
-                }
-
-                // address autocomplete using google autocomplete
-                var autocomplete = new google.maps.places.Autocomplete($(options.address).get(0));
-
-                google.maps.event.addListener(autocomplete, 'place_changed', function () {
-                    var place = autocomplete.getPlace();
-                    if (!place) {
-                        return;
+            // address validation using yii.activeForm.js
+            if ($(options.address).parents('form').length) {
+                var $form = $(options.address).parents('form');
+                $form.on('afterValidateAttribute', function (e, attribute, messages) {
+                    if (attribute.input === options.address && !$(options.latitude).val() && !$(options.longitude).val() && !messages.length) {
+                        // address not found
+                        messages.push(options.addressNotFound);
+                        e.preventDefault();
                     }
-                    selectLocation(place);
                 });
-
-                var defaults = {
-                    'lat': $(options.latitude).val(),
-                    'lng': $(options.longitude).val()
-                };
-                if (defaults.lat && defaults.lng) {
-                    var center = new google.maps.LatLng(defaults.lat, defaults.lng);
-                    map.setCenter(center);
-                    createMarker(center);
-                    setLatLngAttributes(center);
-                }
             }
 
-            initMap();
+            // address autocomplete using google autocomplete
+            var autocomplete = new google.maps.places.Autocomplete($(options.address).get(0));
+
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                var place = autocomplete.getPlace();
+                if (!place) {
+                    return;
+                }
+                selectLocation(place);
+            });
+
+            var defaults = {
+                'lat': $(options.latitude).val(),
+                'lng': $(options.longitude).val()
+            };
+            if (defaults.lat && defaults.lng) {
+                var center = new google.maps.LatLng(defaults.lat, defaults.lng);
+                map.setCenter(center);
+                createMarker(center);
+                setLatLngAttributes(center);
+            }
+        }
+
+        $(document).ready(function () {
+            initialization();
+        });
+
+        function initialization() {
         }
     };
 })(jQuery);

@@ -35,7 +35,10 @@ class SelectMapLocationAssets extends AssetBundle
     public static function register($view)
     {
         /* @var $view \yii\web\View */
-        $view->registerJsFile('https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&loading=async&key=' . self::$googleMapApiKey);
+        $view->registerJsFile(
+            'https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=maps,places&loading=async&callback=initMap&key=' . self::$googleMapApiKey
+//            ,['defer' => true]
+        );
         return parent::register($view);
     }
 }
