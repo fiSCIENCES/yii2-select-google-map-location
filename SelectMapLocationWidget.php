@@ -184,7 +184,7 @@ class SelectMapLocationWidget extends InputWidget
             'longitude'             => '#' . $longitude,
             'draggable'             => $this->draggable,
         ]);
-        // message about not founded addess
+        // message about not founded address
         if (!isset($jsOptions['addressNotFound'])) {
 //            $hasMainCategory = isset(Yii::$app->i18n->translations['*']) || isset(Yii::$app->i18n->translations['main']);
 //            $jsOptions['addressNotFound'] = $hasMainCategory ? Yii::t('main', 'Address not found') : 'Address not found';
@@ -195,15 +195,15 @@ class SelectMapLocationWidget extends InputWidget
                 $(\'#' . $this->wrapperOptions['id'] . '\').selectLocation(' . Json::encode($jsOptions) . ');
             });
         '));
-        $this->view->registerJs(new JsExpression('
-            function getAddress() {
-                let list = $(this).val().split(",");
-                document.getElementById("sladdress-address1").innerHTML = list[0];
-                document.getElementById("sladdress-city").innerHTML = list[1];
-                document.getElementById("sladdress-state").innerHTML = list[2];
-                document.getElementById("sladdress-country").innerHTML = list[3];
-            }
-        '));
+//        $this->view->registerJs(new JsExpression('
+//            function getAddress() {
+//                let list = $(this).val().split(",");
+//                document.getElementById("sladdress-address1").innerHTML = list[0];
+//                document.getElementById("sladdress-city").innerHTML = list[1];
+//                document.getElementById("sladdress-state").innerHTML = list[2];
+//                document.getElementById("sladdress-country").innerHTML = list[3];
+//            }
+//        '));
 
         $mapHtml = Html::tag('div', '', $this->wrapperOptions);
         $mapHtml .= Html::activeHiddenInput($this->model, $this->attributeName);
@@ -228,7 +228,7 @@ class SelectMapLocationWidget extends InputWidget
         }
 
         $this->field->parts['{map}'] = $mapHtml;
-        $this->textOptions['onchange'] = "getAddress()";    // $(this).val()
+//        $this->textOptions['onchange'] = "getAddress()";    // $(this).val()
         return Html::activeInput('text', $this->model, $this->attribute, $this->textOptions);
     }
 }
